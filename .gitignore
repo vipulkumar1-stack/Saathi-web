@@ -1,0 +1,26 @@
+auth_state.json
+report.html
+allure-results/
+allure-report/
+traces/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+.venv/
+
+# Generated reports
+log-report.html
+test-report.xlsx
+full_auto_test-report.xlsx
+report
+heal-report.json
+email-report.log
+
+# Local scratch / debug artifacts
+inspect_output/
+inspect_sanction_date.py
+probe_sanction.py
+.~lock.*#
+test-summary.html
+allure-report.html
