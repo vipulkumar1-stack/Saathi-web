@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 300 python -m pytest tests/test_07_reassign_leads.py::TestReassignLeads::test_search_with_empty_text -p no:randomly --no-header -x)",
+      "Bash(timeout 400 python -m pytest tests/test_07_reassign_leads.py::TestReassignLeads::test_search_with_empty_text -p no:randomly --no-header -rR --tb=long)",
+      "Bash(timeout 400 python -m pytest \"/tmp/claude-1002/-home-aryandadiya-Automation-Saathi/d75a4204-afe2-49d7-98fe-fe9f7d776c7c/scratchpad/test_probe.py\" -p no:randomly --no-header -s -p no:cacheprovider --reruns 0)",
+      "Bash(mkdir -p \"/tmp/claude-1002/-home-aryandadiya-Automation-Saathi/d75a4204-afe2-49d7-98fe-fe9f7d776c7c/scratchpad\")",
+      "Bash(timeout 400 python -m pytest \"/tmp/claude-1002/-home-aryandadiya-Automation-Saathi/d75a4204-afe2-49d7-98fe-fe9f7d776c7c/scratchpad/test_probe.py\" -p no:randomly --no-header -s --reruns 0)",
+      "Bash(cp \"/tmp/claude-1002/-home-aryandadiya-Automation-Saathi/d75a4204-afe2-49d7-98fe-fe9f7d776c7c/scratchpad/test_probe.py\" tests/test_zz_probe_tmp.py)",
+      "Bash(timeout 400 python -m pytest tests/test_zz_probe_tmp.py -p no:randomly --no-header -s --reruns 0)",
+      "Bash(timeout 120 python -m pytest --collect-only -q -p no:randomly)",
+      "Bash(timeout 180 python -m pytest --collect-only -q -p no:randomly)",
+      "Bash(timeout 180 python -m pytest --collect-only -q -o addopts=\"\" -p no:randomly)",
+      "Bash(timeout 300 python -m pytest \"tests/test_19_my_earnings.py::TestMyEarnings::test_tab_switching\" -p no:randomly --no-header --reruns 0)",
+      "Bash(timeout 400 python -m pytest tests/test_20b_profile.py tests/test_19_my_earnings.py::TestMyEarnings::test_tab_switching --no-email -p no:randomly --no-header --reruns 0)"
+    ],
+    "additionalDirectories": [
+      "/home/aryandadiya/Automation Saathi/tests"
+    ]
+  }
+}

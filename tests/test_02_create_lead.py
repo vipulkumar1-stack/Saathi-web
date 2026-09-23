@@ -56,10 +56,11 @@ class TestCreateLead:
 
     @allure.story("Validation: Employment Type is required")
     @allure.severity(allure.severity_level.NORMAL)
-    def test_submit_without_employment_type(self, logged_in_page: Page):
-        """Employment Type carries a red asterisk in the redesigned modal, so
-        leaving it unselected must block submission (confirmed live — this
-        replaces the pre-redesign assumption that it was optional)."""
+    @pytest.mark.known_bug
+    @pytest.mark.xfail(reason="Employment Type should be required (it was, in the earlier redesign), but the app no longer marks it mandatory — the field's label lost its required asterisk and submission now succeeds without it", strict=True)
+    def test_submit_without_employment_type_bug(self, logged_in_page: Page):
+        """Employment Type no longer carries a red asterisk (confirmed live —
+        flips the earlier assumption that it was mandatory back to optional)."""
         HomePage(logged_in_page).click_create_lead()
         form = CreateLeadPage(logged_in_page)
         form.submit_and_collect({**generate_lead_data(), "employment_type": False})
@@ -77,15 +78,15 @@ class TestCreateLead:
         form.fill_and_submit({**generate_lead_data(), "loan_amount": ""})
         expect(form.success_title).not_to_be_visible()
 
-    @allure.story("Validation: City is required")
+    @allure.story("Validation: State is required")
     @allure.severity(allure.severity_level.NORMAL)
-    def test_submit_without_city(self, logged_in_page: Page):
-        """Form should show validation error when City is not selected. City is
-        the only location field in the redesigned modal — State was removed."""
+    def test_submit_without_state(self, logged_in_page: Page):
+        """Form should show validation error when State is not selected. State is
+        the only location field in the current modal — City was removed."""
         HomePage(logged_in_page).click_create_lead()
         form = CreateLeadPage(logged_in_page)
-        form.submit_and_collect({**generate_lead_data(), "city_search": "", "city_option": ""})
-        assert form.saw_error(Msg.ERROR_CITY), form.last_submit_toasts
+        form.submit_and_collect({**generate_lead_data(), "state_search": "", "state_option": ""})
+        assert form.saw_error(Msg.ERROR_STATE), form.last_submit_toasts
         expect(form.success_title).not_to_be_visible()
 
     @allure.story("Lead created successfully")

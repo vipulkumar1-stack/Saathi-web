@@ -73,7 +73,7 @@ class CreateLeadPage(BasePage):
         # an inline <p>; target the paragraph (like city) to avoid a
         # strict-mode match on two elements.
         self.employment_error = page.get_by_role("paragraph").filter(has_text=Msg.ERROR_EMPLOYMENT)
-        self.city_error       = page.get_by_role("paragraph").filter(has_text=Msg.ERROR_CITY)
+        self.state_error      = page.get_by_role("paragraph").filter(has_text=Msg.ERROR_STATE)
 
         # Toasts auto-dismiss, so a plain `expect(...).to_be_visible()` can race
         # a toast that has already vanished. submit_and_collect() polls and
@@ -115,8 +115,17 @@ class CreateLeadPage(BasePage):
         else:
             self.choose_first_option()
 
+    @allure.step("Select state: {option}")
+    def select_state(self, search: str, option: str):
+        self.open_select("State", "cra_state")
+        self.type_in_select("State", search, "cra_state")
+        self.choose_option(option)
+
     @allure.step("Select city: {option}")
     def select_city(self, search: str, option: str):
+        # City is a cascading dropdown — it only renders, and only offers
+        # options, after a State is selected. Callers must select_state()
+        # first (fill_only() does this).
         self.open_select("City", "cra_city")
         self.type_in_select("City", search, "cra_city")
         self.choose_option(option)
@@ -145,8 +154,10 @@ class CreateLeadPage(BasePage):
         purchase_type = data.get("purchase_type")
         if purchase_type:
             self.select_purchase_type(purchase_type if isinstance(purchase_type, str) else None)
-        if data.get("city_search"):
-            self.select_city(data["city_search"], data["city_option"])
+        if data.get("state_search"):
+            self.select_state(data["state_search"], data["state_option"])
+            if data.get("city_search"):
+                self.select_city(data["city_search"], data["city_option"])
         if data.get("loan_amount"):
             self.loan_amount_input.fill(data["loan_amount"])
         if data.get("remarks"):

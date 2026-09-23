@@ -132,7 +132,15 @@ Automation Saathi/
 ├── conftest.py                         # Fixtures, session management, CLI options
 ├── pytest.ini                          # pytest config (retry, allure, markers: e2e, known_bug)
 ├── requirements.txt                    # Python dependencies
-├── Makefile                            # 150+ shortcut commands
+├── Makefile                            # Setup, whole-suite runs, utilities; includes make/*.mk
+├── make/                                # 230+ shortcut commands, split by feature domain
+│   ├── pipeline.mk                     #   Login → create lead → move to login/sanction/disburse
+│   ├── leads.mk                        #   Leads list: filters, columns, reassign, lead detail
+│   ├── team.mk                         #   Add teammate/sourcing partner/role, team partners
+│   ├── tools.mk                        #   Payout/CIBIL/ABB/APF/offers calculators, earnings, help
+│   ├── account.mk                      #   Profile, website settings, raise a query, logout
+│   ├── reports.mk                      #   Allure/Excel/HTML report targets, email, check-targets
+│   └── help.mk                         #   Self-generated `make help` menu
 ├── .env.example                        # Template for environment configuration
 ├── .env                                # Live environment values (gitignored)
 └── auth_state.json                     # Saved login session (auto-created)
@@ -288,7 +296,7 @@ Automation Saathi/
 | **Three auto-generated reports** | HTML log report, Excel spreadsheet, and Allure visual dashboard are produced automatically after every run |
 | **Headless mode** | `make headless` or `HEADLESS=true` runs all tests without a visible browser window — suitable for CI/CD pipelines |
 | **Environment switching** | Change one line in `.env` (`BASE_URL`) to point the entire suite at staging or production — no code changes needed |
-| **Makefile with 150+ commands** | Every test, report, and utility operation is wrapped in a named `make` target. Run a full suite, a single feature area, one specific test, a headless run, or open any of the three reports — all with short memorable commands. Run `make help` to see the full list |
+| **Makefile with 230+ commands** | Every test, report, and utility operation is wrapped in a named `make` target, split across `Makefile` + `make/*.mk` by feature domain. Run a full suite, a single feature area, one specific test, a headless run, or open any of the three reports — all with short memorable commands. Run `make help` to see the full list |
 | **Run any test individually** | Every single test case has its own `make` target (e.g. `make create-lead-duplicate`, `make move-to-sanction-success`, `make payout-calculator-calculate`). Any test can be isolated and re-run without touching surrounding tests |
 | **Manual lead ID override** | Pass `--lead-id`, `--sanction-lead-id`, or `--disburse-lead-id` on the CLI to target any specific lead, bypassing the auto-chaining |
 | **Follow-up scheduling coverage** | Schedule Follow-up is tested from within Login, Sanction, and Disburse stage flows — not just independently |
@@ -493,7 +501,8 @@ All expected toast messages, modal text, and error strings are defined as named 
 2. Add test data variables to `config/config.py` (loaded from `.env`)
 3. Create `tests/test_NN_new_flow.py` — negative tests first, positive last
 4. If the flow needs a lead ID, add a CLI option and fixture in `conftest.py`
-5. Add `make` targets in `Makefile`
+5. Add `make` targets in the matching `make/*.mk` file (or `Makefile` for a whole-suite/utility
+   target), tagging the group-level target with `## description` so it shows up in `make help`
 
 ---
 

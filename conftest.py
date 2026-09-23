@@ -74,7 +74,7 @@ if (
 
 import allure
 from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page
-from config.config import BROWSER, HEADLESS, SLOW_MO, LOGIN_MOBILE, LOGIN_OTP, BASE_URL, TIMEOUT, NAV_TIMEOUT
+from config.config import BROWSER, HEADLESS, SLOW_MO, LOGIN_MOBILE, LOGIN_OTP, BASE_URL, LEADS_URL, TIMEOUT, NAV_TIMEOUT
 from reporters.log_reporter import LogCollector, generate_log_report
 from reporters.excel_reporter import generate_excel_report
 from config.test_metadata import TEST_STEPS
@@ -292,7 +292,7 @@ def _seed_fresh_lead(browser: Browser, auth_state: str) -> str:
     ctx.set_default_timeout(TIMEOUT)
     try:
         pg = ctx.new_page()
-        pg.goto(BASE_URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT)
+        pg.goto(LEADS_URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT)
         HomePage(pg).click_create_lead()
         form = CreateLeadPage(pg)
         form.fill_and_submit(generate_lead_data())
@@ -574,13 +574,18 @@ def _fresh_login(browser: Browser):
     ctx = browser.new_context()
     page = ctx.new_page()
     LoginPage(page).login(mobile=LOGIN_MOBILE, otp=LOGIN_OTP)
-    _progress(f"OTP submitted, waiting up to {NAV_TIMEOUT / 1000:.0f}s for the dashboard…")
-    # login() returns as soon as "Verify" is clicked, but the SPA writes its auth
-    # data to localStorage progressively: the JWT first, then userAccess /
-    # loginUserInfo which gate page access. Saving before those land persists a
-    # session that reuses into /login (no token) or /no-access (token but no
-    # access). Waiting for the dashboard tabs to render is the end-to-end signal
-    # that every required key has been written.
+    _progress(f"OTP submitted, waiting up to {NAV_TIMEOUT / 1000:.0f}s for login to land…")
+    # login() returns as soon as "Verify" is clicked and the SPA then redirects
+    # off /login (to the Dashboard, not My Leads — see LEADS_URL). Once off
+    # /login, navigate straight to My Leads so the teamtab wait below (and every
+    # downstream test) lands on the page that actually has it.
+    page.wait_for_url(lambda url: "/login" not in url, timeout=NAV_TIMEOUT)
+    page.goto(LEADS_URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT)
+    # The SPA writes its auth data to localStorage progressively: the JWT
+    # first, then userAccess / loginUserInfo which gate page access. Saving
+    # before those land persists a session that reuses into /login (no token)
+    # or /no-access (token but no access). Waiting for the leads tabs to
+    # render is the end-to-end signal that every required key has been written.
     page.locator("div.teamtab", has_text="Sanctioned").wait_for(state="visible", timeout=NAV_TIMEOUT)
     ctx.storage_state(path=str(AUTH_STATE))
     ctx.close()
@@ -696,7 +701,7 @@ def logged_in_page(browser: Browser, auth_state: str, request) -> Page:
         node_id = request.node.nodeid
         pg.on("console", lambda msg: _log_collector.add(node_id, msg.type, msg.text))
         pg.on("pageerror", lambda err: _log_collector.add(node_id, "pageerror", str(err)))
-        pg.goto(BASE_URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT)
+        pg.goto(LEADS_URL, wait_until="domcontentloaded", timeout=NAV_TIMEOUT)
         yield pg
     except Exception:
         # An exception here (most commonly the goto() timeout the comment

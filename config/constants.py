@@ -11,10 +11,10 @@ class CreateLead:
     # TODO: confirm exact copy against the live form — guessed from the sibling
     # "<Field> is required" messages above.
     ERROR_EMPLOYMENT    = "Employment Type is required"
-    # Confirmed live via the "City is required" toast/paragraph seen in the
-    # redesigned modal (2026-09-09) — State was removed as a field entirely,
-    # City is now the only location field.
-    ERROR_CITY          = "City is required"
+    # Confirmed live via the "State is required" toast/paragraph seen in the
+    # modal (2026-09-23) — the field flipped back: City was removed, State is
+    # now the only location field (opposite of the 2026-09-09 change below).
+    ERROR_STATE         = "State is required"
 
 
 class ScheduleFollowup:

@@ -24,3 +24,4 @@ probe_sanction.py
 .~lock.*#
 test-summary.html
 allure-report.html
+Automation_test_cases_format.xlsx

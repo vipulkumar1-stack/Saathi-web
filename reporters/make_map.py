@@ -1,10 +1,10 @@
 """Maps each test (and each test file) to the `make` target that reruns it.
 
-Single source of truth: the Makefile's own pytest recipes are parsed
-directly, so this mapping can never drift out of sync with the real
-commands — there is no second table to keep in step. Used by the
-HTML/Excel/log reporters to show, next to every test and every feature
-section, exactly which `make <target>` reruns it.
+Single source of truth: the real pytest recipes are parsed directly out of
+the root Makefile and every make/*.mk it includes, so this mapping can never
+drift out of sync with the real commands — there is no second table to keep
+in step. Used by the HTML/Excel/log reporters to show, next to every test and
+every feature section, exactly which `make <target>` reruns it.
 
 Only recipes that resolve to EXACTLY one test (`pytest tests/x.py::Cls::test_y`)
 or EXACTLY one whole file (`pytest tests/x.py`) are mapped. Anything else —
@@ -19,6 +19,7 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
 _MAKEFILE = _ROOT / "Makefile"
+_MAKE_DIR = _ROOT / "make"
 _TESTS_DIR = _ROOT / "tests"
 
 # A rule header: `name:` at column 0, not a variable assignment (`:=`, `?=`,
@@ -89,13 +90,36 @@ def _classify(recipe: list[str]):
     return None, None  # a bare `Class::` selector — not a single test or a whole file
 
 
+def _makefile_text() -> str:
+    """The root Makefile plus every make/*.mk it `include`s, concatenated.
+
+    Concatenation (rather than actually following the `include` line) is
+    safe here: `_iter_target_recipes` is a line-oriented scanner with no
+    cross-file state, and a file boundary is a non-tab-indented line, which
+    already ends the current recipe block on its own. Missing files are
+    skipped rather than raised, so a repo without a make/ directory (or with
+    one moved/renamed) degrades to whatever the root Makefile alone has.
+    """
+    chunks = []
+    try:
+        chunks.append(_MAKEFILE.read_text(encoding="utf-8"))
+    except OSError:
+        return ""
+    if _MAKE_DIR.is_dir():
+        for path in sorted(_MAKE_DIR.glob("*.mk")):
+            try:
+                chunks.append(path.read_text(encoding="utf-8"))
+            except OSError:
+                continue
+    return "\n".join(chunks)
+
+
 @lru_cache(maxsize=1)
 def _maps():
     per_test: dict[str, str] = {}
     per_file: dict[str, str] = {}
-    try:
-        text = _MAKEFILE.read_text(encoding="utf-8")
-    except OSError:
+    text = _makefile_text()
+    if not text:
         return per_test, per_file
 
     for target, recipe in _iter_target_recipes(text):

@@ -58,7 +58,7 @@ _EXPLICIT_STEPS: dict[str, str] = {
         "2. Enter a wrong OTP and verify — confirm it's rejected and the page\n"
         "   stays on the login screen (Verify button still visible, URL unchanged)\n"
         "3. Enter the correct OTP (same session) and verify\n"
-        "4. Verify redirect to /saathi-leads and save the session to auth_state.json"
+        "4. Verify redirect to /saathi-dashboard and save the session to auth_state.json"
     ),
 
     # ── Create Lead — Self-fulfilled ───────────────────────────────────────────
@@ -98,18 +98,19 @@ _EXPLICIT_STEPS: dict[str, str] = {
         "3. Click Submit\n"
         "4. Verify Loan Type validation error is visible"
     ),
-    "TestCreateLead::test_submit_without_employment_type": (
+    "TestCreateLead::test_submit_without_employment_type_bug": (
         "1. Open the Create Lead form\n"
         "2. Fill all fields except Employment Type (do not select)\n"
         "3. Click Submit\n"
-        "4. Verify Employment Type validation error is visible"
+        "4. Expect Employment Type validation error — KNOWN BUG: the field lost\n"
+        "   its required asterisk and the app now submits successfully without it"
     ),
-    "TestCreateLead::test_submit_without_city": (
+    "TestCreateLead::test_submit_without_state": (
         "1. Open the Create Lead form\n"
-        "2. Fill all fields — leave City unselected (the only location field;\n"
-        "   State was removed from the modal in the 2026-09 redesign)\n"
+        "2. Fill all fields — leave State unselected (the only location field;\n"
+        "   City was removed from the modal)\n"
         "3. Click Submit\n"
-        "4. Verify City validation error is visible"
+        "4. Verify State validation error is visible"
     ),
     "TestCreateLead::test_create_lead_successful": (
         "1. Open the Create Lead form\n"

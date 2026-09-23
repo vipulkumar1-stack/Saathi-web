@@ -5,6 +5,12 @@ load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL", "https://pre-saathi.ambak.com/")
 
+# BASE_URL now lands on the Dashboard (/saathi-dashboard) after a new Dashboard
+# page shipped. Create Lead, the funnel tabs, search box, etc. all still live
+# on My Leads (/saathi-leads), so every fixture that needs those must navigate
+# there explicitly instead of just goto(BASE_URL).
+LEADS_URL = os.getenv("LEADS_URL", BASE_URL.rstrip("/") + "/saathi-leads")
+
 BROWSER = os.getenv("BROWSER", "chromium")
 HEADLESS = os.getenv("HEADLESS", "false").lower() == "true"
 SLOW_MO = int(os.getenv("SLOW_MO", "0"))
@@ -17,9 +23,11 @@ LOGIN_OTP = os.getenv("LOGIN_OTP", "")
 TIMEOUT     = int(os.getenv("TIMEOUT",     "45000"))  # ms — element actions
 NAV_TIMEOUT = int(os.getenv("NAV_TIMEOUT", "60000"))  # ms — page navigation
 
-# The redesigned "Add New Lead" modal dropped the State field entirely — City
-# is now the only location field. Purchase Type is a new, optional field
-# (#property_type); left unset by default since most tests don't need it.
+# The "Add New Lead" modal changed (2026-09-23): State was added back as a new
+# field, and City is now a cascading dropdown that only renders — and only
+# offers options — after a State is selected. Both are required. Purchase
+# Type is a new, optional field (#property_type); left unset by default since
+# most tests don't need it.
 LEAD_DATA = {
     "first_name": "Test",
     "last_name": "User",
@@ -28,6 +36,8 @@ LEAD_DATA = {
     "loan_sub_type": os.getenv("LEAD_LOAN_SUB_TYPE", "BT"),
     "employment_type": os.getenv("LEAD_EMPLOYMENT_TYPE", "Salaried"),
     "purchase_type": os.getenv("LEAD_PURCHASE_TYPE", ""),  # optional; empty = leave unset
+    "state_search":  os.getenv("LEAD_STATE_SEARCH",  "haryana"),
+    "state_option":  os.getenv("LEAD_STATE_OPTION",  "Haryana"),
     "city_search":   os.getenv("LEAD_CITY_SEARCH",   "gurgaon"),
     "city_option":   os.getenv("LEAD_CITY_OPTION",   "Gurgaon"),
     "loan_amount":   os.getenv("LEAD_LOAN_AMOUNT",   "5000000"),

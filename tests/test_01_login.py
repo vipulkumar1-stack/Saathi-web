@@ -45,11 +45,11 @@ class TestLogin:
         login_page.verify_otp()
         page.wait_for_timeout(3000)
         expect(login_page.verify_button).to_be_visible()
-        expect(page).not_to_have_url("https://pre-saathi.ambak.com/saathi-leads")
+        expect(page).not_to_have_url("https://pre-saathi.ambak.com/saathi-dashboard")
         # Correct OTP (same session) → logged in.
         login_page.otp_input.fill(LOGIN_OTP)
         login_page.verify_otp()
-        expect(page).to_have_url("https://pre-saathi.ambak.com/saathi-leads")
+        expect(page).to_have_url("https://pre-saathi.ambak.com/saathi-dashboard")
         page.context.storage_state(path="auth_state.json")
 
     @allure.story("Protected page reachable without a session")
