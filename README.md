@@ -74,7 +74,15 @@ Automation Saathi/
 │   └── data_helper.py         # Random mobile number generator
 ├── conftest.py                # Fixtures: browser, auth session, CLI options
 ├── pytest.ini                 # pytest configuration
-├── Makefile                   # Shortcut commands
+├── Makefile                   # Setup, whole-suite runs, utilities; includes make/*.mk below
+├── make/
+│   ├── pipeline.mk             # Login → create lead → move to login/sanction/disburse
+│   ├── leads.mk                # Leads list: filters, columns, reassign, lead detail
+│   ├── team.mk                 # Add teammate/sourcing partner/role, team partners
+│   ├── tools.mk                # Payout/CIBIL/ABB/APF/offers calculators, my earnings, help & support
+│   ├── account.mk              # Profile, website settings, raise a query, logout
+│   ├── reports.mk              # Allure/Excel/HTML report targets, email, check-targets
+│   └── help.mk                 # Self-generated `make help` menu
 └── requirements.txt           # Dependencies
 ```
 
@@ -413,4 +421,6 @@ All test data lives in `config/config.py`:
 2. Add test data to `config/config.py`
 3. Create `tests/test_0N_new_flow.py` — negative tests first, positive last
 4. Add a `--new-lead-id` CLI option + fixture in `conftest.py`
-5. Add `make` targets in `Makefile`
+5. Add `make` targets in the matching `make/*.mk` file (or `Makefile` for a whole-suite/utility
+   target), tagging the group-level target with `## description` so it shows up in `make help`
+# Saathi-web
